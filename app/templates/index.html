@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Control de Gastos y Ventas - Food Truck</h1>
+
+
+<h2>Registrar Venta</h2>
+<form id="formVenta">
+    <input type="date" id="fechaVenta" name="fecha" required />
+    <input type="number" id="montoVenta" name="monto" placeholder="Monto" required />
+    <input type="text" id="descVenta" name="descripcion" placeholder="Descripción" required />
+    <button class="btn" type="submit">Agregar Venta</button>
+</form>
+
+<h2>Registrar Gasto</h2>
+<form id="formGasto">
+    <input type="date" id="fechaGasto" name="fecha" required />
+    <input type="number" id="montoGasto" name="monto" placeholder="Monto" required />
+    <select id="categoriaGasto" name="categoria">
+        <option value="insumos">Insumos</option>
+        <option value="transporte">Transporte</option>
+        <option value="otros">Otros</option>
+    </select>
+    <input type="text" id="descGasto" name="descripcion" placeholder="Descripción" required />
+    <button class="btn" type="submit">Agregar Gasto</button>
+</form>
+
+<h2>Resumen</h2>
+<div id="resumen" class="resumen-box"></div>
+
+<h2>💰 Ventas</h2>
+<table id="tablaVentas">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Descripción</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h2>🧾 Gastos</h2>
+<table id="tablaGastos">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Categoría</th>
+            <th>Descripción</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    async function cargarDatos() {
+        const [ventasResp, gastosResp] = await Promise.all([
+            fetch("/api/ventas"),
+            fetch("/api/gastos")
+        ]);
+        const ventas = await ventasResp.json();
+        const gastos = await gastosResp.json();
+
+        const ventasPorMes = agruparPorMes(ventas);
+        const gastosPorMes = agruparPorMes(gastos);
+
+        render(ventasPorMes, gastosPorMes);
+    }
+
+    function agruparPorMes(arr) {
+        const datos = {};
+        arr.forEach(item => {
+            const mes = item.fecha.slice(0, 7); // YYYY-MM
+            if (!datos[mes]) datos[mes] = [];
+            datos[mes].push(item);
+        });
+        return datos;
+    }
+
+    async function agregarVenta(e) {
+        e.preventDefault();
+        const data = {
+            fecha: document.getElementById('fechaVenta').value,
+            monto: parseFloat(document.getElementById('montoVenta').value),
+            descripcion: document.getElementById('descVenta').value
+        };
+        await fetch("/api/ventas", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        e.target.reset();
+        cargarDatos();
+    }
+
+    async function agregarGasto(e) {
+        e.preventDefault();
+        const data = {
+            fecha: document.getElementById('fechaGasto').value,
+            monto: parseFloat(document.getElementById('montoGasto').value),
+            categoria: document.getElementById('categoriaGasto').value,
+            descripcion: document.getElementById('descGasto').value
+        };
+        await fetch("/api/gastos", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        e.target.reset();
+        cargarDatos();
+    }
+
+    async function eliminarVenta(id) {
+        if (confirm("¿Eliminar esta venta?")) {
+            await fetch(`/api/ventas/${id}`, { method: "DELETE" });
+            cargarDatos();
+        }
+    }
+
+    async function eliminarGasto(id) {
+        if (confirm("¿Eliminar este gasto?")) {
+            await fetch(`/api/gastos/${id}`, { method: "DELETE" });
+            cargarDatos();
+        }
+    }
+
+    function render(ventas, gastos) {
+        const tbodyVentas = document.querySelector('#tablaVentas tbody');
+        const tbodyGastos = document.querySelector('#tablaGastos tbody');
+        const resumen = document.getElementById('resumen');
+
+        tbodyVentas.innerHTML = '';
+        tbodyGastos.innerHTML = '';
+
+        let totalVentas = 0;
+        let totalGastos = 0;
+
+        const meses = [...new Set([...Object.keys(ventas), ...Object.keys(gastos)])].sort();
+
+        // Ventas por mes
+        for (const mes of meses) {
+            if (ventas[mes]) {
+                let subtotal = 0;
+                tbodyVentas.innerHTML += `<tr><td colspan="4" style="background:#d0e9ff"><strong>Mes: ${mes}</strong></td></tr>`;
+                ventas[mes].forEach(v => {
+                    totalVentas += v.monto;
+                    subtotal += v.monto;
+                    tbodyVentas.innerHTML += `
+                        <tr>
+                            <td>${v.fecha}</td>
+                            <td>$${v.monto.toFixed(2)}</td>
+                            <td>${v.descripcion}</td>
+                            <td><button class="btn" onclick="eliminarVenta(${v.id})">🗑️</button></td>
+                        </tr>`;
+                });
+                tbodyVentas.innerHTML += `<tr><td colspan="4" style="text-align:right"><strong>Total ${mes}: $${subtotal.toFixed(2)}</strong></td></tr>`;
+            }
+        }
+
+        // Gastos por mes
+        for (const mes of meses) {
+            if (gastos[mes]) {
+                let subtotal = 0;
+                tbodyGastos.innerHTML += `<tr><td colspan="5" style="background:#ffe0e0"><strong>Mes: ${mes}</strong></td></tr>`;
+                gastos[mes].forEach(g => {
+                    totalGastos += g.monto;
+                    subtotal += g.monto;
+                    tbodyGastos.innerHTML += `
+                        <tr>
+                            <td>${g.fecha}</td>
+                            <td>$${g.monto.toFixed(2)}</td>
+                            <td>${g.categoria}</td>
+                            <td>${g.descripcion}</td>
+                            <td><button class="btn" onclick="eliminarGasto(${g.id})">🗑️</button></td>
+                        </tr>`;
+                });
+                tbodyGastos.innerHTML += `<tr><td colspan="5" style="text-align:right"><strong>Total ${mes}: $${subtotal.toFixed(2)}</strong></td></tr>`;
+            }
+        }
+
+        const ganancia = totalVentas - totalGastos;
+        resumen.innerHTML = `
+            <span class="ventas">Total Ventas: $${totalVentas.toFixed(2)}</span>
+            <span class="gastos">Total Gastos: $${totalGastos.toFixed(2)}</span>
+            <span class="ganancia">Ganancia: $${ganancia.toFixed(2)}</span>`;
+    }
+
+    // Eventos
+    document.getElementById("formVenta").addEventListener("submit", agregarVenta);
+    document.getElementById("formGasto").addEventListener("submit", agregarGasto);
+
+    // Acceso global
+    window.eliminarVenta = eliminarVenta;
+    window.eliminarGasto = eliminarGasto;
+
+    // Cargar al iniciar
+    cargarDatos();
+});
+</script>
+{% endblock %}

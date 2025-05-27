@@ -1,0 +1,229 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+    background: #f4f6f8;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #1976d2;
+}
+
+h2 {
+    margin-top: 40px;
+    border-left: 5px solid #1976d2;
+    padding-left: 10px;
+    font-size: 1.4rem;
+}
+
+.form-container {
+    background-color: white;
+    max-width: 400px;
+    margin: 30px auto;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #34495e;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 5px #2980b9;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #2980b9;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 5px;
+}
+
+.btn:hover {
+    background-color: #1c5980;
+}
+
+.form-footer {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.form-footer a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Formularios */
+form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+input,
+select {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 8px 12px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #1258a0;
+}
+
+/* Resumen */
+#resumen {
+    font-weight: bold;
+    font-size: 1.1rem;
+    background: #e3f2fd;
+    padding: 10px;
+    border-left: 5px solid #1976d2;
+    border-radius: 4px;
+}
+
+/* Tablas generales */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /* importante para que los bordes se unan bien */
+}
+
+th,
+td {
+    border: 1px solid black;
+    /* línea fina negra */
+    padding: 8px;
+    text-align: left;
+}
+
+/* Encabezado Ventas */
+#tablaVentas thead {
+    background-color: #bbdefb;
+    color: #0d47a1;
+}
+
+/* Encabezado Gastos */
+#tablaGastos thead {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+}
+
+/* Filas alternadas para mejor lectura */
+#tablaVentas tbody tr:nth-child(even),
+#tablaGastos tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Botón exportar */
+button.btn:last-of-type {
+    background: #2e7d32;
+    margin-top: 20px;
+}
+
+button.btn:last-of-type:hover {
+    background: #1b5e20;
+}
+
+/* Caja de resumen */
+.resumen-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    background: #fff;
+    padding: 15px;
+    border-left: 5px solid #1976d2;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Etiquetas de resumen */
+.resumen-box span {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.resumen-box .ventas {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
+.resumen-box .gastos {
+    background-color: #ffebee;
+    color: #b71c1c;
+}
+
+.resumen-box .ganancia {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+btn-delete {
+    background-color: #2e7d32;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #1b5e20;
+}
+
+td button.btn-delete {
+    display: block;
+    margin: 0 auto;
+}
