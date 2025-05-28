@@ -15,4 +15,8 @@ def create_app():
     from .routes import bp
     app.register_blueprint(bp)
 
+    # # Crea las tablas si no existen
+    # with app.app_context():
+    #     db.create_all()
+
     return app
