@@ -3,7 +3,6 @@
 {% block content %}
 <h1>Control de Gastos y Ventas - Food Truck</h1>
 
-
 <h2>Registrar Venta</h2>
 <form id="formVenta">
     <input type="date" id="fechaVenta" name="fecha" required />
@@ -25,8 +24,11 @@
     <button class="btn" type="submit">Agregar Gasto</button>
 </form>
 
-<h2>Resumen</h2>
+<h2>Resumen General</h2>
 <div id="resumen" class="resumen-box"></div>
+
+<h2>Resumen Mensual</h2>
+<div id="resumenMensual" class="resumen-box"></div>
 
 <h2>💰 Ventas</h2>
 <table id="tablaVentas">
@@ -56,6 +58,7 @@
 </table>
 
 {% endblock %}
+
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -134,23 +137,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbodyVentas = document.querySelector('#tablaVentas tbody');
         const tbodyGastos = document.querySelector('#tablaGastos tbody');
         const resumen = document.getElementById('resumen');
+        const resumenMensual = document.getElementById('resumenMensual');
 
         tbodyVentas.innerHTML = '';
         tbodyGastos.innerHTML = '';
+        resumenMensual.innerHTML = '';
 
         let totalVentas = 0;
         let totalGastos = 0;
 
         const meses = [...new Set([...Object.keys(ventas), ...Object.keys(gastos)])].sort();
 
-        // Ventas por mes
         for (const mes of meses) {
+            let subtotalVentas = 0;
+            let subtotalGastos = 0;
+
             if (ventas[mes]) {
-                let subtotal = 0;
-                tbodyVentas.innerHTML += `<tr><td colspan="4" style="background:#d0e9ff"><strong>Mes: ${mes}</strong></td></tr>`;
+                tbodyVentas.innerHTML += `<tr><td colspan="4"><strong>${mes}</strong></td></tr>`;
                 ventas[mes].forEach(v => {
                     totalVentas += v.monto;
-                    subtotal += v.monto;
+                    subtotalVentas += v.monto;
                     tbodyVentas.innerHTML += `
                         <tr>
                             <td>${v.fecha}</td>
@@ -159,18 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td><button class="btn" onclick="eliminarVenta(${v.id})">🗑️</button></td>
                         </tr>`;
                 });
-                tbodyVentas.innerHTML += `<tr><td colspan="4" style="text-align:right"><strong>Total ${mes}: $${subtotal.toFixed(2)}</strong></td></tr>`;
             }
-        }
 
-        // Gastos por mes
-        for (const mes of meses) {
             if (gastos[mes]) {
-                let subtotal = 0;
-                tbodyGastos.innerHTML += `<tr><td colspan="5" style="background:#ffe0e0"><strong>Mes: ${mes}</strong></td></tr>`;
+                tbodyGastos.innerHTML += `<tr><td colspan="5"><strong>${mes}</strong></td></tr>`;
                 gastos[mes].forEach(g => {
                     totalGastos += g.monto;
-                    subtotal += g.monto;
+                    subtotalGastos += g.monto;
                     tbodyGastos.innerHTML += `
                         <tr>
                             <td>${g.fecha}</td>
@@ -180,26 +181,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td><button class="btn" onclick="eliminarGasto(${g.id})">🗑️</button></td>
                         </tr>`;
                 });
-                tbodyGastos.innerHTML += `<tr><td colspan="5" style="text-align:right"><strong>Total ${mes}: $${subtotal.toFixed(2)}</strong></td></tr>`;
             }
+
+            const diferencia = subtotalVentas - subtotalGastos;
+            resumenMensual.innerHTML += `
+                <div style="margin: 10px 0; padding: 10px; background: #f3f3f3; border-radius: 6px;">
+                    <strong>🗓️ Mes: ${mes}</strong><br>
+                    Total Ventas: $${subtotalVentas.toFixed(2)}<br>
+                    Total Gastos: $${subtotalGastos.toFixed(2)}<br>
+                    Diferencia: $${diferencia.toFixed(2)}
+                </div>`;
         }
 
         const ganancia = totalVentas - totalGastos;
         resumen.innerHTML = `
             <span class="ventas">Total Ventas: $${totalVentas.toFixed(2)}</span>
             <span class="gastos">Total Gastos: $${totalGastos.toFixed(2)}</span>
-            <span class="ganancia">Ganancia: $${ganancia.toFixed(2)}</span>`;
+            <span class="ganancia">${ganancia >= 0 ? 'Ganancia' : 'Pérdida'}: $${ganancia.toFixed(2)}</span>`;
     }
 
-    // Eventos
     document.getElementById("formVenta").addEventListener("submit", agregarVenta);
     document.getElementById("formGasto").addEventListener("submit", agregarGasto);
 
-    // Acceso global
     window.eliminarVenta = eliminarVenta;
     window.eliminarGasto = eliminarGasto;
 
-    // Cargar al iniciar
     cargarDatos();
 });
 </script>
